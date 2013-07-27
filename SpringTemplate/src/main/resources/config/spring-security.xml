@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2013 Mradul Pandey Licensed under the Apache License, Version
+	2.0 (the "License"); you may not use this file except in compliance with
+	the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+	Unless required by applicable law or agreed to in writing, software distributed
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for
+	the specific language governing permissions and limitations under the License. -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+          http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+          http://www.springframework.org/schema/security
+          http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+
+	<bean id="loggerInjector" class="com.mradul.template.log.postprocessors.LoggerInjector" />
+
+	<bean id="authProvider" class="com.mradul.template.auth.TemplateAuthProvider" />
+
+	<!-- global-method-security : pre-post-annotations to "true" enables the
+		use of annotations like @PreAuthorize that are relatively new and allow the
+		use of Expression Language -->
+
+	<security:global-method-security
+		pre-post-annotations="enabled" />
+
+	<!-- Configures a custom authentication success handler that returns HTTP
+		status code 200 -->
+	<bean id="restAuthenticationSuccessHandler"
+		class="com.mradul.template.auth.rest.RestAuthenticationSuccessHandler" />
+
+	<!-- Configures a custom authentication failure handler that returns HTTP
+		status code 401 -->
+	<bean id="restAuthenticationFailureHandler"
+		class="com.mradul.template.auth.rest.RestAuthenticationFailureHandler" />
+
+	<!-- Configures a custom logout success handler that returns HTTP status
+		code 200 -->
+	<bean id="restLogoutSuccessHandler" class="com.mradul.template.auth.rest.RestLogoutSuccessHandler" />
+
+	<!-- Configures the authentication entry point that returns HTTP status
+		code 401 -->
+	<bean id="restAuthenticationEntryPoint"
+		class="com.mradul.template.auth.rest.RestAuthenticationEntryPoint" />
+
+
+	<!-- Configures a custom login filter bean -->
+	<bean id="loginFilter"
+		class="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter">
+		<property name="authenticationManager" ref="authenticationManager" />
+		<property name="authenticationFailureHandler" ref="restAuthenticationFailureHandler" />
+		<property name="authenticationSuccessHandler" ref="restAuthenticationSuccessHandler" />
+		<property name="filterProcessesUrl" value="/services/auth/login" />
+		<property name="usernameParameter" value="username" />
+		<property name="passwordParameter" value="password" />
+		<property name="postOnly" value="true" />
+	</bean>
+
+	<security:http use-expressions='true' pattern="/services/**"
+		entry-point-ref="restAuthenticationEntryPoint">
+		<security:intercept-url pattern="/**"
+			access="hasRole('AUTHORITY_admin')" />
+		<!-- Adds the custom login filter to Spring Security filter chain -->
+		<security:custom-filter ref="loginFilter"
+			position="FORM_LOGIN_FILTER" />
+		<!-- Adds a logout filter to Spring Security filter chain -->
+		<security:logout logout-url="/services/auth/logout"
+			delete-cookies="true" invalidate-session="true" success-handler-ref="restLogoutSuccessHandler" />
+	</security:http>
+
+
+
+	<security:http auto-config='true' use-expressions='true'>
+		<security:intercept-url pattern="/site/auth/**"
+			access="permitAll" />
+		<security:intercept-url pattern="/site/**"
+			access="hasRole('AUTHORITY_admin')" />
+		<security:form-login login-page="/site/auth/login"
+			default-target-url="/site/index" authentication-failure-url="/site/auth/loginfailed" />
+		<security:logout logout-success-url="/site/auth/login"
+			logout-url="/site/auth/logout" invalidate-session="true" />
+	</security:http>
+
+	<security:authentication-manager alias="authenticationManager">
+		<security:authentication-provider
+			ref="authProvider"></security:authentication-provider>
+	</security:authentication-manager>
+
+</beans>

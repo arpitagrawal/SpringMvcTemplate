@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2013 Mradul Pandey
+  
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+    http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<Context debug="0" reloadable="true">
+	<Resource name="jdbc/MyDb" auth="Container" type="javax.sql.DataSource"
+		factory="org.apache.tomcat.dbcp.dbcp.BasicDataSourceFactory" username="root"
+		password="root" driverClassName="com.mysql.jdbc.Driver"
+		url="jdbc:mysql://localhost:3306/test?autoReconnect=true" maxWait="-1"
+		removeAbandoned="true" maxActive="50" maxIdle="10"
+		removeAbandonedTimeout="60" logAbandoned="true" validationQuery="SELECT 1"
+		testOnBorrow="true" poolPreparedStatements="true"
+		minEvictableIdleTimeMillis="10000" timeBetweenEvictionRunsMillis="120000"
+		testWhileIdle="true" />
+</Context>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2013 Mradul Pandey
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:c="http://www.springframework.org/schema/c" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd">
+
+	<context:component-scan base-package="com.mradul.template.rest.controllers" />
+	<mvc:annotation-driven
+		content-negotiation-manager="cnManager" />
+
+	<!-- Inject Logger object -->
+	<bean id="loggerInjector" class="com.mradul.template.log.postprocessors.LoggerInjector" />
+
+	<!-- Configures view for returning JSON to the client -->
+	<bean
+		class="org.springframework.web.servlet.view.json.MappingJacksonJsonView">
+		<property name="contentType" value="text/plain" />
+	</bean>
+
+	<!-- Simple strategy: only path extension is taken into account -->
+	<bean id="cnManager"
+		class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+		<property name="favorPathExtension" value="true" />
+		<property name="ignoreAcceptHeader" value="false" />
+		<property name="defaultContentType" value="application/json" />
+		<property name="useJaf" value="false" />
+
+		<property name="mediaTypes">
+			<map>
+				<entry key="html" value="text/html" />
+				<entry key="json" value="application/json" />
+				<entry key="xml" value="application/xml" />
+			</map>
+		</property>
+	</bean>
+
+
+</beans>
