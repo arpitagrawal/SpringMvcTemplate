@@ -1,4 +1,6 @@
 SpringMvcTemplate
 =================
 
-POC: spring mvc with rest and hibernate
+POC: spring mvc, security with rest and hibernate
+
+(Not yet completed)
